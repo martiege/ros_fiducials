@@ -1,0 +1,29 @@
+<launch> 
+
+  <arg name="tag_family"            default="tag36h11" /> 
+  <arg name="quad_decimate"         default="2.0" /> 
+  <arg name="quad_sigma"            default="0.0" /> 
+  <arg name="nthreads"              default="1" /> 
+  <arg name="debug"                 default="false" /> 
+  <arg name="refine_edges"          default="true" /> 
+  <arg name="detections_topic"      default="detections" /> 
+  <arg name="detections_queue_size" default="10" /> 
+  <arg name="camera_base_topic"     default="/usb_cam/image_raw" /> 
+  <arg name="camera_queue_size"     default="10" /> 
+
+  <group ns="ros_fiducials_detectors"> 
+    <node pkg="ros_fiducials_detectors" type="apriltag_detector_node" name="apriltag_detector_node" output="screen"> 
+      <param name="family"                 value="$(arg tag_family)" /> 
+      <param name="detector_quad_decimate" value="$(arg quad_decimate)" /> 
+      <param name="detector_quad_sigma"    value="$(arg quad_sigma)" /> 
+      <param name="detector_nthreads"      value="$(arg nthreads)" /> 
+      <param name="detector_debug"         value="$(arg debug)" /> 
+      <param name="detector_refine_edges"  value="$(arg refine_edges)" /> 
+      <param name="detection_topic"        value="$(arg detections_topic)" /> 
+      <param name="detection_queue_size"   value="$(arg detections_queue_size)" /> 
+      <param name="camera_base_topic"      value="$(arg camera_base_topic)" /> 
+      <param name="camera_queue_size"      value="$(arg camera_queue_size)" /> 
+    </node>
+  </group> 
+
+</launch>
