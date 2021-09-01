@@ -7,7 +7,6 @@
   // Apriltag Family includes 
 extern "C" {
 #include "tag16h5.h"
-#include "tag25h11.h"
 #include "tag25h9.h"
 #include "tag36h11.h"
 #include "tagCircle21h7.h"
@@ -25,7 +24,6 @@ enum class ApriltagFamily
 {
   undefined, 
   tag16h5,
-  tag25h11,
   tag25h9,
   tag36h11,
   tagCircle21h7,
@@ -39,7 +37,6 @@ enum class ApriltagFamily
 static std::map<std::string, ApriltagFamily> const ApriltagFamilyMap
 {
   { "tag16h5", ApriltagFamily::tag16h5 }, 
-  { "tag25h11", ApriltagFamily::tag25h11 }, 
   { "tag25h9", ApriltagFamily::tag25h9 }, 
   { "tag36h11", ApriltagFamily::tag36h11 }, 
   { "tagCircle21h7", ApriltagFamily::tagCircle21h7 }, 
@@ -66,8 +63,6 @@ inline apriltag_family_t* createApriltagFamily(const ApriltagFamily& family)
   {
   case ApriltagFamily::tag16h5:
     return tag16h5_create(); 
-  case ApriltagFamily::tag25h11:
-    return tag25h11_create(); 
   case ApriltagFamily::tag25h9:
     return tag25h9_create(); 
   case ApriltagFamily::tag36h11:
@@ -94,9 +89,6 @@ inline void destroyApriltagFamily(apriltag_family_t* tf, const ApriltagFamily& f
   {
   case ApriltagFamily::tag16h5:
     tag16h5_destroy(tf); 
-    break; 
-  case ApriltagFamily::tag25h11:
-    tag25h11_destroy(tf); 
     break; 
   case ApriltagFamily::tag25h9:
     tag25h9_destroy(tf); 

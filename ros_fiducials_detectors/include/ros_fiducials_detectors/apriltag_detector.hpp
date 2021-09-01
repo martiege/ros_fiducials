@@ -2,18 +2,19 @@
 
 #include <memory> 
 
-#include "sensor_msgs/Image.h"
-#include "sensor_msgs/CameraInfo.h"
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
 
-#include "sensor_msgs/image_encodings.h"
+#include <sensor_msgs/image_encodings.h>
 
-#include "cv_bridge/cv_bridge.h"
+#include <cv_bridge/cv_bridge.h>
 
-#include "ros_fiducials_msgs/Detection.h"
-#include "ros_fiducials_msgs/DetectionArray.h"
+#include <ros_fiducials_msgs/Detection.h>
+#include <ros_fiducials_msgs/DetectionArray.h>
 
 #include "ros_fiducials_detectors/fiducial_detector.hpp"
 #include "ros_fiducials_detectors/apriltag_defined_families.h"
+
 
 namespace ros_fiducials_detectors
 {
@@ -75,11 +76,19 @@ private:
       ros_fiducials_msgs::Detection ros_det; 
       
       ros_det.id = det->id; 
-      for (int j{0}; j < 4; ++j)
-      {
-        ros_det.points[j].x = det->p[j][0]; 
-        ros_det.points[j].x = det->p[j][1]; 
-      }
+      
+      ros_det.bottom_left.x = det->p[0][0]; 
+      ros_det.bottom_left.y = det->p[0][1]; 
+
+      ros_det.bottom_right.x = det->p[1][0]; 
+      ros_det.bottom_right.y = det->p[1][1]; 
+
+      ros_det.upper_right.x = det->p[2][0]; 
+      ros_det.upper_right.y = det->p[2][1]; 
+
+      ros_det.upper_left.x = det->p[3][0]; 
+      ros_det.upper_left.y = det->p[3][1]; 
+
       ros_det.data.push_back(det->decision_margin); 
       ros_det.data.push_back(det->hamming); 
       ros_det.data.push_back(det->c[0]); 

@@ -5,7 +5,7 @@ project(ros_fiducials_detectors)
 add_compile_options(-std=c++11)
 
 execute_process(
-  COMMAND python scripts/apriltag_includes_update.py --output_path ${CMAKE_CURRENT_LIST_DIR}/include --namespace ${PROJECT_NAME}
+  COMMAND python3 scripts/apriltag_includes_update.py --output_path ${CMAKE_CURRENT_LIST_DIR}/include --namespace ${PROJECT_NAME}
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   RESULT_VARIABLE PYTHON_APRILTAG_FAMILY_GENERATE_RESULT
 )
@@ -33,7 +33,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3 REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 pkg_search_module(apriltag REQUIRED apriltag)
 set(apriltag_INCLUDE_DIRS "${apriltag_INCLUDE_DIRS}/apriltag")
@@ -142,7 +143,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${apriltag_INCLUDE_DIRS}
-  ${OPENCV_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -189,10 +190,10 @@ target_link_libraries(apriltag_detector_node
   ${apriltag_LIBRARIES}
 )
 
-target_link_libraries(apriltag_detector_node
+target_link_libraries(aruco_detector_node
   ${catkin_LIBRARIES}
   ${apriltag_LIBRARIES}
-  ${OPENCV_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 
 #############

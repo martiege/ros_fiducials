@@ -63,10 +63,10 @@ inline void destroy""" + enum + """(apriltag_family_t* tf, const """ + enum + ""
     tag_name = tag_file[len(apriltag_include_path):]
     apriltag_include_string    += '#include "' + tag_name + '"\n'
     apriltag_enum_string       += 2 * " " + tag_name[:-2] + ",\n"
-    apriltag_static_map_string += 2 * " " + '{ "' + tag_name[:-2] + f'", {enum}::' + tag_name[:-2] + " }, \n"
-    apriltag_create_function   += 2 * " " + f"case {enum}::" + tag_name[:-2] + ":\n"
+    apriltag_static_map_string += 2 * " " + '{ "' + tag_name[:-2] + '", ' + enum + '::' + tag_name[:-2] + " }, \n"
+    apriltag_create_function   += 2 * " " + "case " + enum + "::" + tag_name[:-2] + ":\n"
     apriltag_create_function   += 4 * " " + "return " + tag_name[:-2] + "_create(); \n"
-    apriltag_destroy_function  += 2 * " " + f"case {enum}::" + tag_name[:-2] + ":\n"
+    apriltag_destroy_function  += 2 * " " + "case " + enum + "::" + tag_name[:-2] + ":\n"
     apriltag_destroy_function  += 4 * " " + tag_name[:-2] + "_destroy(tf); \n"
     apriltag_destroy_function  += 4 * " " + "break; \n"
 
