@@ -36,20 +36,20 @@ int main(int argc, char** argv)
     return EXIT_FAILURE; 
   }
 
-  std::string detection_topic; 
-  int32_t detection_queue_size{0}; 
-  if (pnh.getParam("detection_topic", detection_topic)) 
-    ROS_INFO_STREAM("ros_fiducials_detectors/aruco_main: detection_topic: " << detection_topic); 
+  std::string detections_topic; 
+  int32_t detections_queue_size{0}; 
+  if (pnh.getParam("detections_topic", detections_topic)) 
+    ROS_INFO_STREAM("ros_fiducials_detectors/aruco_main: detections_topic: " << detections_topic); 
   else 
   {
-    ROS_ERROR("ros_fiducials_detectors/aruco_main: detection_topic not found"); 
+    ROS_ERROR("ros_fiducials_detectors/aruco_main: detections_topic not found"); 
     return EXIT_FAILURE; 
   }
-  if (pnh.getParam("detection_queue_size", detection_queue_size))
-    ROS_INFO_STREAM("ros_fiducials_detectors/aruco_main: detection_queue_size: " << detection_queue_size); 
+  if (pnh.getParam("detections_queue_size", detections_queue_size))
+    ROS_INFO_STREAM("ros_fiducials_detectors/aruco_main: detections_queue_size: " << detections_queue_size); 
   else 
   {
-    ROS_ERROR("ros_fiducials_detectors/aruco_main: detection_queue_size not found"); 
+    ROS_ERROR("ros_fiducials_detectors/aruco_main: detections_queue_size not found"); 
     return EXIT_FAILURE; 
   }
 
@@ -245,7 +245,7 @@ int main(int argc, char** argv)
   ros_fiducials_detectors::ArucoDetector detector(
     pnh, 
     camera_base_topic, camera_queue_size, 
-    detection_topic, detection_queue_size, 
+    detections_topic, detections_queue_size, 
     aruco_dictionary, 
     adaptiveThreshConstant, adaptiveThreshWinSizeMax, adaptiveThreshWinSizeMin, adaptiveThreshWinSizeStep,
     cornerRefinementMaxIterations, cornerRefinementMinAccuracy, cornerRefinementWinSize,

@@ -1,5 +1,5 @@
 <launch> 
-  <arg name="param_path" default="$(find ros_fiducials_detectors)/config/apriltag_detector_default.yaml" />
+  <arg name="param_path" default="$(find ros_fiducials_detectors)/config/aruco_detector_default.yaml" />
 
   <group ns="ros_fiducials_detectors"> 
     <node pkg="ros_fiducials_detectors" type="aruco_detector_node" name="aruco_detector_node" output="screen"> 
