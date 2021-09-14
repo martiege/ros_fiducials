@@ -1,59 +1,9 @@
 <launch> 
-  <arg name="detections_topic"                      default="detections" /> 
-  <arg name="detections_queue_size"                 default="100" /> 
-  <arg name="camera_base_topic"                     default="/usb_cam/image_raw" /> 
-  <arg name="camera_queue_size"                     default="100" /> 
-
-  <arg name="aruco_dictionary"                      default="DICT_ARUCO_ORIGINAL" />
-
-  <arg name="adaptiveThreshConstant"                default="3" />
-  <arg name="adaptiveThreshWinSizeMax"              default="23" />
-  <arg name="adaptiveThreshWinSizeMin"              default="10" />
-  <arg name="adaptiveThreshWinSizeStep"             default="7" />
-  <arg name="cornerRefinementMaxIterations"         default="30" />
-  <arg name="cornerRefinementMinAccuracy"           default="0.1" />
-  <arg name="cornerRefinementWinSize"               default="5" />
-  <arg name="errorCorrectionRate"                   default="0.6" />
-  <arg name="markerBorderBits"                      default="1" />
-  <arg name="maxErroneousBitsInBorderRate"          default="0.35" />
-  <arg name="maxMarkerPerimeterRate"                default="4.0" />
-  <arg name="minCornerDistanceRate"                 default="0.05" />
-  <arg name="minDistanceToBorder"                   default="3" />
-  <arg name="minMarkerDistanceRate"                 default="0.05" />
-  <arg name="minMarkerPerimeterRate"                default="0.03" />
-  <arg name="minOtsuStdDev"                         default="5.0" />
-  <arg name="doCornerRefinement"                    default="true" />
-  <arg name="perspectiveRemoveIgnoredMarginPerCell" default="0.13" />
-  <arg name="perspectiveRemovePixelPerCell"         default="4" />
-  <arg name="polygonalApproxAccuracyRate"           default="0.05" />
+  <arg name="param_path" default="$(find ros_fiducials_detectors)/config/apriltag_detector_default.yaml" />
 
   <group ns="ros_fiducials_detectors"> 
     <node pkg="ros_fiducials_detectors" type="aruco_detector_node" name="aruco_detector_node" output="screen"> 
-      <param name="aruco_dictionary"                      value="$(arg aruco_dictionary)" />
-      <param name="adaptiveThreshConstant"                value="$(arg adaptiveThreshConstant)" />
-      <param name="adaptiveThreshWinSizeMax"              value="$(arg adaptiveThreshWinSizeMax)" />
-      <param name="adaptiveThreshWinSizeMin"              value="$(arg adaptiveThreshWinSizeMin)" />
-      <param name="adaptiveThreshWinSizeStep"             value="$(arg adaptiveThreshWinSizeStep)" />
-      <param name="cornerRefinementMaxIterations"         value="$(arg cornerRefinementMaxIterations)" />
-      <param name="cornerRefinementMinAccuracy"           value="$(arg cornerRefinementMinAccuracy)" />
-      <param name="cornerRefinementWinSize"               value="$(arg cornerRefinementWinSize)" />
-      <param name="errorCorrectionRate"                   value="$(arg errorCorrectionRate)" />
-      <param name="markerBorderBits"                      value="$(arg markerBorderBits)" />
-      <param name="maxErroneousBitsInBorderRate"          value="$(arg maxErroneousBitsInBorderRate)" />
-      <param name="maxMarkerPerimeterRate"                value="$(arg maxMarkerPerimeterRate)" />
-      <param name="minCornerDistanceRate"                 value="$(arg minCornerDistanceRate)" />
-      <param name="minDistanceToBorder"                   value="$(arg minDistanceToBorder)" />
-      <param name="minMarkerDistanceRate"                 value="$(arg minMarkerDistanceRate)" />
-      <param name="minMarkerPerimeterRate"                value="$(arg minMarkerPerimeterRate)" />
-      <param name="minOtsuStdDev"                         value="$(arg minOtsuStdDev)" />
-      <param name="doCornerRefinement"                    value="$(arg doCornerRefinement)" />
-      <param name="perspectiveRemoveIgnoredMarginPerCell" value="$(arg perspectiveRemoveIgnoredMarginPerCell)" />
-      <param name="perspectiveRemovePixelPerCell"         value="$(arg perspectiveRemovePixelPerCell)" />
-      <param name="polygonalApproxAccuracyRate"           value="$(arg polygonalApproxAccuracyRate)" />
-      <param name="detection_topic"                       value="$(arg detections_topic)" /> 
-      <param name="detection_queue_size"                  value="$(arg detections_queue_size)" /> 
-      <param name="camera_base_topic"                     value="$(arg camera_base_topic)" /> 
-      <param name="camera_queue_size"                     value="$(arg camera_queue_size)" /> 
+      <rosparam command="load" file="$(arg param_path)" />
     </node>
   </group> 
 

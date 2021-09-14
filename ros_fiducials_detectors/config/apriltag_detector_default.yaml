@@ -1,0 +1,15 @@
+# Publisher parameters. 
+detections_topic:      "detections"
+detections_queue_size:  10
+
+# Subscriber parameters.
+camera_base_topic:     "/usb_cam/image_raw"
+camera_queue_size:      10
+
+# Aruco detector parameters. 
+tag_family:            "tag36h11"
+quad_decimate:          2.0 
+quad_sigma:             0.0 
+nthreads:               1 
+debug:                  false
+refine_edges:           true

@@ -1,0 +1,30 @@
+# Publisher parameters. 
+detections_topic:      "detections"
+detections_queue_size:  10
+
+# Subscriber parameters. 
+camera_base_topic:     "/usb_cam/image_raw"
+camera_queue_size:      10
+
+# Aruco detector parameters. 
+aruco_dictionary:                      "DICT_ARUCO_ORIGINAL"
+adaptiveThreshConstant:                 3
+adaptiveThreshWinSizeMax:               23 
+adaptiveThreshWinSizeMin:               10
+adaptiveThreshWinSizeStep:              7 
+cornerRefinementMaxIterations:          30 
+cornerRefinementMinAccuracy:            0.1 
+cornerRefinementWinSize:                5 
+errorCorrectionRate:                    0.6 
+markerBorderBits:                       1 
+maxErroneousBitsInBorderRate:           0.35 
+maxMarkerPerimeterRate:                 4.0 
+minCornerDistanceRate:                  0.05 
+minDistanceToBorder:                    3 
+minMarkerDistanceRate:                  0.05 
+minMarkerPerimeterRate:                 0.03 
+minOtsuStdDev:                          5.0 
+doCornerRefinement:                     true 
+perspectiveRemoveIgnoredMarginPerCell:  0.13 
+perspectiveRemovePixelPerCell:          4 
+polygonalApproxAccuracyRate:            0.05 

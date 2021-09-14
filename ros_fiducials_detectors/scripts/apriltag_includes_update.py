@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
-import sys
-import glob
+import sys 
+import glob 
 import pkgconfig 
 import argparse 
 

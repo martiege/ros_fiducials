@@ -1,20 +1,17 @@
-#pragma once
+#pragma once 
 
-// #include <Eigen/Dense> 
-
-// #include <opencv2/core.hpp>
+#include <cstddef>
 
 #include <map> 
-#include <array> 
+#include <array>
 #include <vector> 
 
-#include "ros_fiducials_msgs/Point2D.h"
-#include "ros_fiducials_msgs/Detection.h"
-#include "ros_fiducials_msgs/DetectionArray.h"
+#include <ros_fiducials_msgs/Point2D.h>
+#include <ros_fiducials_msgs/Detection.h>
+#include <ros_fiducials_msgs/DetectionArray.h>
 
 
-
-namespace ros_fiducials_msgs
+namespace ros_fiducials_conversions
 {
 
 std::vector<double>::iterator fromMsg(std::vector<double>::iterator it, std::vector<double>::iterator end, const Point2D& point)
@@ -129,6 +126,22 @@ void fromMsg(std::vector<std::array<double, 2>>& result, const DetectionArray& d
   fromMsg(std::next(result.begin(), n_origin), result.end(), detectionArray); 
 }
 
+void fromMsg(std::map<std::size_t, std::array<double, 2>>& result, const DetectionArray& detectionArray)
+{
+  result.clear(); 
 
-} // namespace ros_fiducials_msgs
+  for (const Detection& detection : detectionArray.detections)
+  {
+    result[4 * detection.id + 0][0] = detection.bottom_left.x;
+    result[4 * detection.id + 0][1] = detection.bottom_left.y; 
+    result[4 * detection.id + 1][0] = detection.bottom_right.x; 
+    result[4 * detection.id + 1][1] = detection.bottom_right.y; 
+    result[4 * detection.id + 2][0] = detection.upper_right.x; 
+    result[4 * detection.id + 2][1] = detection.upper_right.y; 
+    result[4 * detection.id + 3][0] = detection.upper_left.x; 
+    result[4 * detection.id + 3][1] = detection.upper_left.y; 
+  }
+}
 
+
+} // ros_fiducials_conversions
