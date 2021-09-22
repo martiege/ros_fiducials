@@ -8,7 +8,7 @@
 
 #include <sensor_msgs/Image.h>
 
-#include "ros_fiducials_msgs/DetectionArray.h"
+#include "fiducial_msgs/DetectionArray.h"
 
 
 class FiducialDetector
@@ -21,7 +21,7 @@ private:
 
   ros::Publisher detectionPublisher_; 
 
-  virtual ros_fiducials_msgs::DetectionArray detect_fiducials(
+  virtual fiducial_msgs::DetectionArray detect_fiducials(
     const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::CameraInfoConstPtr& camera_info_msg
   ) = 0; 
 public: 
@@ -35,14 +35,14 @@ public:
       camera_base_topic, camera_queue_size, &FiducialDetector::detector_callback, this
     ); 
 
-    detectionPublisher_ = nh_.advertise<ros_fiducials_msgs::DetectionArray>(
+    detectionPublisher_ = nh_.advertise<fiducial_msgs::DetectionArray>(
       detection_topic, detection_queue_size
     );
   }
 
   void detector_callback(const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::CameraInfoConstPtr& camera_info_msg)
   {
-    ros_fiducials_msgs::DetectionArray detections = detect_fiducials(image_msg, camera_info_msg); 
+    fiducial_msgs::DetectionArray detections = detect_fiducials(image_msg, camera_info_msg); 
 
     detectionPublisher_.publish(detections); 
   }

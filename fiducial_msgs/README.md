@@ -1,4 +1,4 @@
-# `ros_fiducials_msgs` 
+# `fiducial_msgs` 
 
 Messages for publishing detections of fiducial markers in a generalized manner.
 

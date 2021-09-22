@@ -9,14 +9,14 @@
 
 #include <cv_bridge/cv_bridge.h>
 
-#include <ros_fiducials_msgs/Detection.h>
-#include <ros_fiducials_msgs/DetectionArray.h>
+#include <fiducial_msgs/Detection.h>
+#include <fiducial_msgs/DetectionArray.h>
 
-#include "ros_fiducials_detectors/fiducial_detector.hpp"
-#include "ros_fiducials_detectors/apriltag_defined_families.h"
+#include "fiducial_detectors/fiducial_detector.hpp"
+#include "fiducial_detectors/apriltag_defined_families.h"
 
 
-namespace ros_fiducials_detectors
+namespace fiducial_detectors
 {
 
 class ApriltagDetector : public FiducialDetector
@@ -26,12 +26,12 @@ private:
   apriltag_family_t* family_; 
   apriltag_detector_t* detector_; 
   
-  ros_fiducials_msgs::DetectionArray detect_fiducials(
+  fiducial_msgs::DetectionArray detect_fiducials(
     const sensor_msgs::ImageConstPtr& image_msg, 
     const sensor_msgs::CameraInfoConstPtr& camera_info_msg
   ) override 
   {
-    ros_fiducials_msgs::DetectionArray detectionArray; 
+    fiducial_msgs::DetectionArray detectionArray; 
     detectionArray.header = image_msg->header; 
     detectionArray.detector = "apriltag"; 
 
@@ -42,7 +42,7 @@ private:
     }
     catch (cv_bridge::Exception& e)
     {
-      ROS_WARN_STREAM("cv_bridge::toCvShare exception in ros_fiducials_detectors/apriltag_detector.hpp: " << e.what()); 
+      ROS_WARN_STREAM("cv_bridge::toCvShare exception in fiducial_detectors/apriltag_detector.hpp: " << e.what()); 
       return detectionArray; 
     }
 
@@ -55,7 +55,7 @@ private:
       gray = img_ptr->image.clone();
     else
     {
-      ROS_WARN_STREAM("Unknown sensor_msgs::image_encodings in ros_fiducials_detectors/apriltag_detector.hpp: " << img_ptr->encoding); 
+      ROS_WARN_STREAM("Unknown sensor_msgs::image_encodings in fiducial_detectors/apriltag_detector.hpp: " << img_ptr->encoding); 
       return detectionArray; 
     }
 
@@ -73,7 +73,7 @@ private:
     { 
       zarray_get(detections, i, &det);
 
-      ros_fiducials_msgs::Detection ros_det; 
+      fiducial_msgs::Detection ros_det; 
       
       ros_det.id = det->id; 
       
@@ -151,4 +151,4 @@ public:
   }
 };
 
-} // namespace ros_fiducials_detectors 
+} // namespace fiducial_detectors 

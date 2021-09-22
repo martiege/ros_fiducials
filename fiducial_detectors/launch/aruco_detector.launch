@@ -1,0 +1,10 @@
+<launch> 
+  <arg name="param_path" default="$(find fiducial_detectors)/config/aruco_detector_default.yaml" />
+
+  <group ns="fiducial_detectors"> 
+    <node pkg="fiducial_detectors" type="aruco_detector_node" name="aruco_detector_node" output="screen"> 
+      <rosparam command="load" file="$(arg param_path)" />
+    </node>
+  </group> 
+
+</launch>

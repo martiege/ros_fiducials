@@ -1,143 +1,112 @@
-#include <ros/ros.h> 
+#pragma once
 
-#include <string> 
+#include <memory> 
+#include <vector> 
+
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
+
+#include <sensor_msgs/image_encodings.h>
+
+#include <cv_bridge/cv_bridge.h>
+
+#include <fiducial_msgs/Detection.h>
+#include <fiducial_msgs/DetectionArray.h>
+
+#include <opencv2/aruco.hpp>
+
+#include "fiducial_detectors/fiducial_detector.hpp"
 
 
-#include "ros_fiducials_detectors/apriltag_detector.hpp"
-
-
-int main(int argc, char** argv)
+namespace fiducial_detectors
 {
-  ros::init(argc, argv, "apriltag_detector_node"); 
 
-  ros::NodeHandle pnh("~"); 
+class ArucoDetector : public FiducialDetector
+{
+private: 
+  cv::Ptr<cv::aruco::DetectorParameters> parameters_;
+  cv::Ptr<cv::aruco::Dictionary> dictionary_;
 
-  std::string camera_base_topic; 
-  int32_t camera_queue_size{0}; 
-  if (pnh.getParam("camera_base_topic", camera_base_topic))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: camera_base_topic: " << camera_base_topic); 
-  else 
+  std::vector<int> ids_; 
+  std::vector<std::vector<cv::Point2f>> corners_, rejected_; 
+
+  fiducial_msgs::DetectionArray detect_fiducials(
+    const sensor_msgs::ImageConstPtr& image_msg, 
+    const sensor_msgs::CameraInfoConstPtr& camera_info_msg
+  ) override 
   {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: camera_base_topic not found"); 
-    return EXIT_FAILURE; 
+    fiducial_msgs::DetectionArray detectionArray; 
+    detectionArray.header = image_msg->header; 
+    detectionArray.detector = "aruco";
+
+    cv_bridge::CvImagePtr img_ptr; 
+    try
+    {
+      // TODO: generalise? 
+      img_ptr = cv_bridge::toCvCopy(image_msg, "bgr8"); 
+    }
+    catch (cv_bridge::Exception& e)
+    {
+      ROS_WARN_STREAM("fiducial_detectors/aruco_detector: cv_bridge::toCvCopy exception in fiducial_detectors/apriltag_detector.hpp: " << e.what()); 
+      return detectionArray; 
+    }
+
+    cv::aruco::detectMarkers(
+      img_ptr->image, 
+      dictionary_, 
+      corners_, ids_, 
+      parameters_, 
+      rejected_
+    ); 
+
+    if (! corners_.empty())
+    {
+      for (std::size_t i{0}; i < corners_.size(); ++i)
+      {
+        fiducial_msgs::Detection ros_det; 
+        ros_det.id = ids_[i]; 
+
+        ros_det.upper_left.x = corners_[i][0].x; 
+        ros_det.upper_left.y = corners_[i][0].y; 
+
+        ros_det.upper_right.x = corners_[i][1].x; 
+        ros_det.upper_right.y = corners_[i][1].y;  
+
+        ros_det.bottom_right.x = corners_[i][2].x; 
+        ros_det.bottom_right.y = corners_[i][2].y; 
+
+        ros_det.bottom_left.x = corners_[i][3].x; 
+        ros_det.bottom_left.y = corners_[i][3].y; 
+
+        detectionArray.detections.push_back(ros_det); 
+      }
+    }
+
+    return detectionArray; 
   }
-  if (pnh.getParam("camera_queue_size", camera_queue_size)) 
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: camera_queue_size: " << camera_queue_size); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: camera_queue_size not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  std::string detections_topic; 
-  int32_t detections_queue_size{0}; 
-  if (pnh.getParam("detections_topic", detections_topic)) 
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: detections_topic: " << detections_topic); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: detections_topic not found"); 
-    return EXIT_FAILURE; 
-  }
-  if (pnh.getParam("detections_queue_size", detections_queue_size))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: detections_queue_size: " << detections_queue_size); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: detections_queue_size not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  std::string tag_family; 
-  if (pnh.getParam("tag_family", tag_family))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: tag_family: " << tag_family); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: tag_family not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  double quad_decimate{0}; 
-  if (pnh.getParam("quad_decimate", quad_decimate))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: quad_decimate: " << quad_decimate); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: quad_decimate not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  double quad_sigma{0}; 
-  if (pnh.getParam("quad_sigma", quad_sigma))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: quad_sigma: " << quad_sigma); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: quad_sigma not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  int nthreads{0}; 
-  if (pnh.getParam("nthreads", nthreads))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: nthreads: " << nthreads); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: nthreads not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  bool debug{false}; 
-  if (pnh.getParam("debug", debug))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: debug: " << debug); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: debug not found"); 
-    return EXIT_FAILURE; 
-  }
-
-  bool refine_edges{false};
-  if (pnh.getParam("refine_edges", refine_edges))
-    ROS_INFO_STREAM("ros_fiducials_detectors/apriltag_main: refine_edges: " << refine_edges); 
-  else 
-  {
-    ROS_ERROR("ros_fiducials_detectors/apriltag_main: refine_edges not found"); 
-    return EXIT_FAILURE; 
-  }
-  
-
-  ros_fiducials_detectors::ApriltagDetector detector(
-    pnh, 
-    camera_base_topic, camera_queue_size, 
-    detections_topic, detections_queue_size, 
-    tag_family, 
-    quad_decimate, quad_sigma, 
-    nthreads, debug, refine_edges
-  ); 
-
-  ros::spin(); 
-
-  return 0;
-}
-
-/*
 
 public: 
   ArucoDetector(
     const ros::NodeHandle& nh, 
     const std::string& camera_base_topic, uint32_t camera_queue_size, 
-    const std::string& detections_topic,   uint32_t detections_queue_size, 
+    const std::string& detection_topic,   uint32_t detection_queue_size, 
     const std::string& aruco_dictionary, 
     double adaptiveThreshConstant, int adaptiveThreshWinSizeMax, int	adaptiveThreshWinSizeMin, int	adaptiveThreshWinSizeStep,
-    int	cornerRefinementMaxIterations, int cornerRefinementMethod, double cornerRefinementMinAccuracy, int cornerRefinementWinSize,
+    int	cornerRefinementMaxIterations, double cornerRefinementMinAccuracy, int cornerRefinementWinSize,
     double errorCorrectionRate,
     int	markerBorderBits,
     double maxErroneousBitsInBorderRate, double maxMarkerPerimeterRate,
     double minCornerDistanceRate, int minDistanceToBorder, double minMarkerDistanceRate, double minMarkerPerimeterRate, double minOtsuStdDev,
+    bool doCornerRefinement,
     double perspectiveRemoveIgnoredMarginPerCell, int perspectiveRemovePixelPerCell,
     double polygonalApproxAccuracyRate
   ) : FiducialDetector(
       nh, 
       camera_base_topic, camera_queue_size, 
-      detections_topic, detections_queue_size
+      detection_topic, detection_queue_size
     )
   {
-{    if (aruco_dictionary == "DICT_4X4_50")
+    if (aruco_dictionary == "DICT_4X4_50")
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
     else if (aruco_dictionary == "DICT_4X4_100")
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
@@ -173,9 +142,10 @@ public:
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
     else 
     {
-      ROS_ERROR_STREAM("ros_fiducials_detectors/aruco_detector: UNDEFINED ARUCO DICTIONARY: " << aruco_dictionary << ", CHOOSING: DICT_4X4_50"); 
+      ROS_ERROR_STREAM("fiducial_detectors/aruco_detector: UNDEFINED ARUCO DICTIONARY: " << aruco_dictionary << ", CHOOSING: DICT_4X4_50"); 
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-    }}
+    }
+    
 
     parameters_ = cv::aruco::DetectorParameters::create(); 
     parameters_->adaptiveThreshWinSizeMax = adaptiveThreshWinSizeMax;
@@ -193,8 +163,12 @@ public:
     parameters_->minMarkerDistanceRate = minMarkerDistanceRate;
     parameters_->minMarkerPerimeterRate = minMarkerPerimeterRate;
     parameters_->minOtsuStdDev = minOtsuStdDev;
+    parameters_->doCornerRefinement = doCornerRefinement; 
     parameters_->perspectiveRemoveIgnoredMarginPerCell = perspectiveRemoveIgnoredMarginPerCell;
     parameters_->perspectiveRemovePixelPerCell = perspectiveRemovePixelPerCell;
     parameters_->polygonalApproxAccuracyRate = polygonalApproxAccuracyRate;
   }
-}; */
+}; 
+
+
+} // namespace fiducial_detectors

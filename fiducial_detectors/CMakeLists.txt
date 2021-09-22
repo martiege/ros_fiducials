@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(ros_fiducials_detectors)
+project(fiducial_detectors)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -28,12 +28,12 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
-  ros_fiducials_msgs
+  fiducial_msgs
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV 3 QUIET)
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(apriltag REQUIRED apriltag)
@@ -128,7 +128,7 @@ link_directories(${apriltag_LIBDIR})
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES ros_fiducials_detectors
+ LIBRARIES fiducial_detectors
  CATKIN_DEPENDS cv_bridge geometry_msgs image_geometry roscpp rospy sensor_msgs std_msgs image_transport
 #  DEPENDS system_lib
 )
@@ -148,7 +148,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/ros_fiducials_detectors.cpp
+#   src/${PROJECT_NAME}/fiducial_detectors.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -159,14 +159,34 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/ros_fiducials_detectors_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/fiducial_detectors_node.cpp)
 add_executable(
   apriltag_detector_node src/apriltag_main.cpp
 )
 
-add_executable(
-  aruco_detector_node src/aruco_main.cpp
+add_dependencies(apriltag_detector_node ${catkin_EXPORTED_TARGETS})
+  
+target_link_libraries(apriltag_detector_node
+  ${catkin_LIBRARIES}
+  ${apriltag_LIBRARIES}
 )
+
+if(OpenCV_FOUND)
+
+  add_executable(
+    aruco_detector_node src/aruco_main.cpp
+  )
+
+  add_dependencies(aruco_detector_node ${catkin_EXPORTED_TARGETS})
+
+  target_link_libraries(aruco_detector_node
+    ${catkin_LIBRARIES}
+    ${apriltag_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+  )
+  
+endif()
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -177,24 +197,13 @@ add_executable(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(apriltag_detector_node ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(aruco_detector_node ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(apriltag_detector_node
-  ${catkin_LIBRARIES}
-  ${apriltag_LIBRARIES}
-)
 
-target_link_libraries(aruco_detector_node
-  ${catkin_LIBRARIES}
-  ${apriltag_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-)
 
 #############
 ## Install ##
@@ -243,7 +252,7 @@ target_link_libraries(aruco_detector_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_ros_fiducials_detectors.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_fiducial_detectors.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

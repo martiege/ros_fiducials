@@ -1,5 +1,5 @@
 <launch> 
-  <arg name="param_path" default="$(find ros_fiducials_detectors)/config/apriltag_detector_default.yaml" />
+  <arg name="param_path" default="$(find fiducial_detectors)/config/apriltag_detector_default.yaml" />
   <!-- <arg name="detections_topic"      default="detections" /> 
   <arg name="detections_queue_size" default="10" /> 
 
@@ -13,8 +13,8 @@
   <arg name="debug"                 default="false" /> 
   <arg name="refine_edges"          default="true" />  -->
 
-  <group ns="ros_fiducials_detectors"> 
-    <node pkg="ros_fiducials_detectors" type="apriltag_detector_node" name="apriltag_detector_node" output="screen"> 
+  <group ns="fiducial_detectors"> 
+    <node pkg="fiducial_detectors" type="apriltag_detector_node" name="apriltag_detector_node" output="screen"> 
       <rosparam command="load" file="$(arg param_path)" />
       <!-- <param name="family"                 value="$(arg tag_family)" /> 
       <param name="detector_quad_decimate" value="$(arg quad_decimate)" /> 

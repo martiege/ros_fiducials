@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(ros_fiducials_msgs)
+project(fiducial_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
   message_generation

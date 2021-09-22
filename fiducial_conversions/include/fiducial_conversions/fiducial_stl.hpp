@@ -6,12 +6,12 @@
 #include <array>
 #include <vector> 
 
-#include <ros_fiducials_msgs/Point2D.h>
-#include <ros_fiducials_msgs/Detection.h>
-#include <ros_fiducials_msgs/DetectionArray.h>
+#include <fiducial_msgs/Point2D.h>
+#include <fiducial_msgs/Detection.h>
+#include <fiducial_msgs/DetectionArray.h>
 
 
-namespace ros_fiducials_conversions
+namespace fiducial_conversions
 {
 
 std::vector<double>::iterator fromMsg(std::vector<double>::iterator it, std::vector<double>::iterator end, const Point2D& point)
@@ -144,4 +144,4 @@ void fromMsg(std::map<std::size_t, std::array<double, 2>>& result, const Detecti
 }
 
 
-} // ros_fiducials_conversions
+} // fiducial_conversions
