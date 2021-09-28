@@ -6,25 +6,189 @@ detections_queue_size:  10
 camera_base_topic:     "/usb_cam/image_raw"
 camera_queue_size:      10
 
-# Aruco detector parameters. 
+## Aruco detector parameters. 
+# Each dictionary indicates the number 
+# of bits and the number of 
+# markers contained
+# - DICT_ARUCO_ORIGINAL: standard ArUco Library Markers. 
+# 1024 markers, 5x5 bits, 0 minimum distance
+#   "DICT_4X4_50"
+#   "DICT_4X4_100"
+#   "DICT_4X4_250"
+#   "DICT_4X4_1000"
+#   "DICT_5X5_50"
+#   "DICT_5X5_100"
+#   "DICT_5X5_250"
+#   "DICT_5X5_1000"
+#   "DICT_6X6_50"
+#   "DICT_6X6_100"
+#   "DICT_6X6_250"
+#   "DICT_6X6_1000"
+#   "DICT_7X7_50"
+#   "DICT_7X7_100"
+#   "DICT_7X7_250"
+#   "DICT_7X7_1000"
+#   "DICT_ARUCO_ORIGINAL"
+#     5x5 bits, 0 minimum 
+#     distance. 1024 codes. 
+#   "DICT_APRILTAG_16h5"     
+#     4x4 bits, minimum hamming 
+#     distance between any two 
+#     codes = 5, 30 codes
+#   "DICT_APRILTAG_25h9" 
+#     5x5 bits, minimum hamming
+#     distance between any two
+#     codes = 9, 35 codes
+#   "DICT_APRILTAG_36h10" 
+#     6x6 bits, minimum hamming
+#     distance between any two
+#     codes = 10, 2320 codes
+#   "DICT_APRILTAG_36h11" 
+#     6x6 bits, minimum hamming
+#     distance between any two
+#     codes = 11, 587 codes
 aruco_dictionary:                      "DICT_ARUCO_ORIGINAL"
-adaptiveThreshConstant:                 3
+
+# Maximum window size for adaptive
+# thresholding before finding contours 
+# (default 23).
 adaptiveThreshWinSizeMax:               23 
-adaptiveThreshWinSizeMin:               10
-adaptiveThreshWinSizeStep:              7 
+# minimum window size for adaptive 
+# thresholding before finding contours
+# (default 3).
+adaptiveThreshWinSizeMin:               3
+# Increments from 
+# adaptiveThreshWinSizeMin to 
+# adaptiveThreshWinSizeMax during the
+# thresholding (default 10).
+adaptiveThreshWinSizeStep:              10 
+# Maximum number of iterations for 
+# stop criteria of the corner
+#  refinement process (default 30).
 cornerRefinementMaxIterations:          30 
-cornerRefinementMinAccuracy:            0.1 
+# Minimum error for the stop cristeria
+# of the corner refinement process 
+# (default: 0.1)
+cornerRefinementMinAccuracy:            0.1
+# Window size for the corner 
+# refinement process (in pixels) 
+# (default 5). 
 cornerRefinementWinSize:                5 
+# Error correction rate respect to 
+# the maximun error correction 
+# capability for each dictionary. 
+# (default 0.6).
 errorCorrectionRate:                    0.6 
+# Number of bits of the marker border, 
+# i.e. marker border width (default 1).
 markerBorderBits:                       1 
+# Maximum number of accepted erroneous 
+# bits in the border (i.e. number of
+# allowed white bits in the border). 
+# Represented as a rate respect to the 
+# total number of bits per marker 
+# (default 0.35).
 maxErroneousBitsInBorderRate:           0.35 
+# Determine maximum perimeter for 
+# marker contour to be detected. This 
+# is defined as a rate respect to the 
+# maximum dimension of the input image 
+# (default 4.0).
 maxMarkerPerimeterRate:                 4.0 
+# Minimum distance between corners 
+# for detected markers relative 
+# to its perimeter (default 0.05)
 minCornerDistanceRate:                  0.05 
+# Minimum distance of any corner to
+# the image border for detected 
+# markers (in pixels) (default 3)
 minDistanceToBorder:                    3 
+# Minimum mean distance beetween two 
+# marker corners to be considered 
+# similar, so that the smaller one is
+# removed. The rate is relative to 
+# the smaller perimeter of the two 
+# markers (default 0.05).
 minMarkerDistanceRate:                  0.05 
-minMarkerPerimeterRate:                 0.03 
+# Determine minimum perimeter for 
+# marker contour to be detected. 
+# This is defined as a rate respect 
+# to the maximum dimension of 
+# the input image (default 0.03).
+minMarkerPerimeterRate:                 0.03
+# Minimun standard deviation in pixels
+# values during the decodification 
+# step to apply Otsu thresholding 
+# (otherwise, all the bits are set to 
+# 0 or 1 depending on mean higher 
+# than 128 or not) (default 5.0) 
 minOtsuStdDev:                          5.0 
-doCornerRefinement:                     true 
+# width of the margin of pixels 
+# on each cell not considered 
+# for the determination of the cell bit. 
+# Represents the rate respect to the total
+# size of the cell, i.e. perspectiveRemovePixelPerCell 
+# (default 0.13)
 perspectiveRemoveIgnoredMarginPerCell:  0.13 
+# number of bits (per dimension) 
+# for each cell of the marker
+# when removing the perspective 
+# (default 4).
 perspectiveRemovePixelPerCell:          4 
-polygonalApproxAccuracyRate:            0.05 
+# Minimum accuracy during the 
+# polygonal approximation process to
+# determine which contours are squares. 
+# (default 0.03)
+polygonalApproxAccuracyRate:            0.03 
+
+## OpenCV Version <= 3.2
+# Only one refinement method
+doCornerRefinement:                     true 
+
+## OpenCV Version >= 4
+# Constant for adaptive thresholding 
+# before finding contours (default 7)
+adaptiveThreshConstant:                 7
+
+## Corner refinement method. 
+# CORNER_REFINE_NONE, 
+#   no refinement.
+# CORNER_REFINE_SUBPIX, 
+#   do subpixel refinement. 
+# CORNER_REFINE_CONTOUR, 
+#   use contour-Points,
+# CORNER_REFINE_APRILTAG, 
+#   use the AprilTag2 approach. 
+# (default CORNER_REFINE_NONE)
+cornerRefinementMethod:                "CORNER_REFINE_NONE"
+
+## Parameters for AprilTag detection using the ArUco detector
+# Detection of quads can be done on a lower-resolution image, improving speed at a
+# cost of pose accuracy and a slight decrease in detection rate. 
+# Decoding the binary payload is still done at full resolution. (default 0.0)
+aprilTagQuadDecimate:                   0.0
+# What Gaussian blur should be applied to the segmented image (used for quad detection?)
+# Parameter is the standard deviation in pixels. 
+# Very noisy images benefit from non-zero values (e.g. 0.8). (default 0.0)
+aprilTagQuadSigma:                      0.8
+# Reject quads containing too few pixels. (default 5)
+aprilTagMinClusterPixels:               5
+# How many corner candidates to consider when segmenting a group of pixels into a quad. (default 10)
+aprilTagMaxNmaxima:                     10
+# Reject quads where pairs of edges have angles that are close to straight or close to
+# 180 degrees. Zero means that no quads are rejected. (In radians) (default 10*PI/180)
+aprilTagCriticalRad:                    0.17453292519943295
+# When fitting lines to the contours, what is the maximum mean squared error
+# allowed?  This is useful in rejecting contours that are far from being quad shaped; rejecting
+# these quads "early" saves expensive decoding processing. (default 10.0)
+aprilTagMaxLineFitMse:                  10.0
+# Detection of quads can be done on a lower-resolution image, improving speed at a
+# cost of pose accuracy and a slight decrease in detection rate. 
+# Decoding the binary payload is still done at full resolution. (default 0.0)
+aprilTagMinWhiteBlackDiff:              5
+# Should the thresholded image be deglitched? 
+# Only useful for very noisy images. (default 0)
+aprilTagDeglitch:                       0.0
+# To check if there is a white marker. In order to generate a "white" marker just
+# invert a normal marker by using a tilde, ~markerImage. (default false)
+detectInvertedMarker:                   false

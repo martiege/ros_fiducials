@@ -1,10 +1,8 @@
-#include "fiducial_conversions/fiducial_stl.hpp"
+#pragma once 
 
 #include <fiducial_msgs/Point2D.h>
 #include <fiducial_msgs/Detection.h>
 #include <fiducial_msgs/DetectionArray.h>
-
-#include <gtest/gtest.h>
 
 #include <cstdlib>
 #include <random>
@@ -34,11 +32,14 @@ fiducial_msgs::DetectionArray generateTestData(
     fiducial_msgs::Detection detection; 
     detection.id = id_dist(device); 
 
+    // TODO: Generate more realistic data? 
+    // e.g. place a marker in a 3D world, then project 
+    // onto an image
     double u = image_width_dist(device); 
     double v = image_height_dist(device); 
 
     detection.bottom_left.x = u; 
-    detection.bottom_left.y = v;
+    detection.bottom_left.y = v; 
 
     detection.bottom_right.x = u + detection_width_dist(device); 
     detection.bottom_right.y = v; 
@@ -51,16 +52,4 @@ fiducial_msgs::DetectionArray generateTestData(
   }
 
   return detections; 
-}
-
-TEST(FiducialConversions, pointConversion)
-{
-
-}
-
-int main(int argc, char** argv)
-{
-  
-
-  return EXIT_SUCCESS; 
 }

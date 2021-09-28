@@ -62,15 +62,6 @@ int main(int argc, char** argv)
     return EXIT_FAILURE; 
   }
 
-  double adaptiveThreshConstant; 
-  if (pnh.getParam("adaptiveThreshConstant", adaptiveThreshConstant))
-    ROS_INFO_STREAM("fiducial_detectors/aruco_main: adaptiveThreshConstant: " << adaptiveThreshConstant); 
-  else 
-  {
-    ROS_ERROR("fiducial_detectors/aruco_main: adaptiveThreshConstant not found"); 
-    return EXIT_FAILURE; 
-  }
-
   int adaptiveThreshWinSizeMax; 
   if (pnh.getParam("adaptiveThreshWinSizeMax", adaptiveThreshWinSizeMax))
     ROS_INFO_STREAM("fiducial_detectors/aruco_main: adaptiveThreshWinSizeMax: " << adaptiveThreshWinSizeMax); 
@@ -206,15 +197,6 @@ int main(int argc, char** argv)
     return EXIT_FAILURE; 
   } 
 
-  bool doCornerRefinement; 
-  if (pnh.getParam("doCornerRefinement", doCornerRefinement))
-    ROS_INFO_STREAM("fiducial_detectors/aruco_main: doCornerRefinement: " << doCornerRefinement); 
-  else 
-  {
-    ROS_ERROR("fiducial_detectors/aruco_main: doCornerRefinement not found"); 
-    return EXIT_FAILURE; 
-  } 
-
   double perspectiveRemoveIgnoredMarginPerCell; 
   if (pnh.getParam("perspectiveRemoveIgnoredMarginPerCell", perspectiveRemoveIgnoredMarginPerCell))
     ROS_INFO_STREAM("fiducial_detectors/aruco_main: perspectiveRemoveIgnoredMarginPerCell: " << perspectiveRemoveIgnoredMarginPerCell); 
@@ -240,22 +222,146 @@ int main(int argc, char** argv)
   {
     ROS_ERROR("fiducial_detectors/aruco_main: polygonalApproxAccuracyRate not found"); 
     return EXIT_FAILURE; 
+  }
+
+#if (CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR <= 2)
+  bool doCornerRefinement; 
+  if (pnh.getParam("doCornerRefinement", doCornerRefinement))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: doCornerRefinement: " << doCornerRefinement); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: doCornerRefinement not found"); 
+    return EXIT_FAILURE; 
   } 
+#endif 
+#if (CV_VERSION_MAJOR == 4 || (CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR > 2))
+  double adaptiveThreshConstant; 
+  if (pnh.getParam("adaptiveThreshConstant", adaptiveThreshConstant))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: adaptiveThreshConstant: " << adaptiveThreshConstant); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: adaptiveThreshConstant not found"); 
+    return EXIT_FAILURE; 
+  }
+
+  std::string cornerRefinementMethod; 
+  if (pnh.getParam("cornerRefinementMethod", cornerRefinementMethod))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: cornerRefinementMethod: " << cornerRefinementMethod); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: cornerRefinementMethod not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+#if CV_VERSION_MAJOR == 4
+  float aprilTagQuadDecimate; 
+  if (pnh.getParam("aprilTagQuadDecimate", aprilTagQuadDecimate))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagQuadDecimate: " << aprilTagQuadDecimate); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagQuadDecimate not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  float aprilTagQuadSigma; 
+  if (pnh.getParam("aprilTagQuadSigma", aprilTagQuadSigma))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagQuadSigma: " << aprilTagQuadSigma); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagQuadSigma not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  int aprilTagMinClusterPixels; 
+  if (pnh.getParam("aprilTagMinClusterPixels", aprilTagMinClusterPixels))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagMinClusterPixels: " << aprilTagMinClusterPixels); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagMinClusterPixels not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  int aprilTagMaxNmaxima; 
+  if (pnh.getParam("aprilTagMaxNmaxima", aprilTagMaxNmaxima))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagMaxNmaxima: " << aprilTagMaxNmaxima); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagMaxNmaxima not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  float aprilTagCriticalRad; 
+  if (pnh.getParam("aprilTagCriticalRad", aprilTagCriticalRad))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagCriticalRad: " << aprilTagCriticalRad); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagCriticalRad not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  float aprilTagMaxLineFitMse; 
+  if (pnh.getParam("aprilTagMaxLineFitMse", aprilTagMaxLineFitMse))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagMaxLineFitMse: " << aprilTagMaxLineFitMse); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagMaxLineFitMse not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  int aprilTagMinWhiteBlackDiff; 
+  if (pnh.getParam("aprilTagMinWhiteBlackDiff", aprilTagMinWhiteBlackDiff))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagMinWhiteBlackDiff: " << aprilTagMinWhiteBlackDiff); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagMinWhiteBlackDiff not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  int aprilTagDeglitch; 
+  if (pnh.getParam("aprilTagDeglitch", aprilTagDeglitch))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: aprilTagDeglitch: " << aprilTagDeglitch); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: aprilTagDeglitch not found"); 
+    return EXIT_FAILURE; 
+  } 
+
+  bool detectInvertedMarker; 
+  if (pnh.getParam("detectInvertedMarker", detectInvertedMarker))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: detectInvertedMarker: " << detectInvertedMarker); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: detectInvertedMarker not found"); 
+    return EXIT_FAILURE; 
+  } 
+#endif
+#endif
 
   fiducial_detectors::ArucoDetector detector(
     pnh, 
     camera_base_topic, camera_queue_size, 
     detections_topic, detections_queue_size, 
     aruco_dictionary, 
-    adaptiveThreshConstant, adaptiveThreshWinSizeMax, adaptiveThreshWinSizeMin, adaptiveThreshWinSizeStep,
+    adaptiveThreshWinSizeMax, adaptiveThreshWinSizeMin, adaptiveThreshWinSizeStep,
     cornerRefinementMaxIterations, cornerRefinementMinAccuracy, cornerRefinementWinSize,
     errorCorrectionRate,
     markerBorderBits,
     maxErroneousBitsInBorderRate, maxMarkerPerimeterRate,
     minCornerDistanceRate, minDistanceToBorder, minMarkerDistanceRate, minMarkerPerimeterRate, minOtsuStdDev,
-    doCornerRefinement,
     perspectiveRemoveIgnoredMarginPerCell, perspectiveRemovePixelPerCell,
-    polygonalApproxAccuracyRate
+    polygonalApproxAccuracyRate,
+#if CV_VERSION_MAJOR == 3
+    doCornerRefinement
+#endif 
+#if CV_VERSION_MAJOR == 4
+    adaptiveThreshConstant, 
+    cornerRefinementMethod,
+    aprilTagQuadDecimate, aprilTagQuadSigma,
+    aprilTagMinClusterPixels, aprilTagMaxNmaxima,
+    aprilTagCriticalRad, aprilTagMaxLineFitMse,
+    aprilTagMinWhiteBlackDiff, aprilTagDeglitch, 
+    detectInvertedMarker
+#endif
   ); 
 
   ros::spin(); 

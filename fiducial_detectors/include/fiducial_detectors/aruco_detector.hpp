@@ -13,6 +13,7 @@
 #include <fiducial_msgs/Detection.h>
 #include <fiducial_msgs/DetectionArray.h>
 
+#include <opencv2/opencv.hpp>
 #include <opencv2/aruco.hpp>
 
 #include "fiducial_detectors/fiducial_detector.hpp"
@@ -91,15 +92,31 @@ public:
     const std::string& camera_base_topic, uint32_t camera_queue_size, 
     const std::string& detection_topic,   uint32_t detection_queue_size, 
     const std::string& aruco_dictionary, 
-    double adaptiveThreshConstant, int adaptiveThreshWinSizeMax, int	adaptiveThreshWinSizeMin, int	adaptiveThreshWinSizeStep,
+    int adaptiveThreshWinSizeMax, int	adaptiveThreshWinSizeMin, int	adaptiveThreshWinSizeStep,
     int	cornerRefinementMaxIterations, double cornerRefinementMinAccuracy, int cornerRefinementWinSize,
     double errorCorrectionRate,
     int	markerBorderBits,
     double maxErroneousBitsInBorderRate, double maxMarkerPerimeterRate,
     double minCornerDistanceRate, int minDistanceToBorder, double minMarkerDistanceRate, double minMarkerPerimeterRate, double minOtsuStdDev,
-    bool doCornerRefinement,
     double perspectiveRemoveIgnoredMarginPerCell, int perspectiveRemovePixelPerCell,
-    double polygonalApproxAccuracyRate
+    double polygonalApproxAccuracyRate, 
+#if CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR <= 2
+    bool doCornerRefinement
+#endif
+#if CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR > 2
+    double adaptiveThreshConstant, 
+    const std::string& cornerRefinementMethod
+#endif
+#if CV_VERSION_MAJOR == 4
+    double adaptiveThreshConstant, 
+    const std::string& cornerRefinementMethod,
+    float aprilTagQuadDecimate, 
+    float aprilTagQuadSigma,
+    int aprilTagMinClusterPixels, int aprilTagMaxNmaxima,
+    float aprilTagCriticalRad, float aprilTagMaxLineFitMse,
+    int aprilTagMinWhiteBlackDiff, int aprilTagDeglitch, 
+    bool detectInvertedMarker
+#endif
   ) : FiducialDetector(
       nh, 
       camera_base_topic, camera_queue_size, 
@@ -140,6 +157,16 @@ public:
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_7X7_1000);
     else if (aruco_dictionary == "DICT_ARUCO_ORIGINAL")
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
+#if CV_VERSION_MAJOR == 4
+    else if (aruco_dictionary == "DICT_APRILTAG_16h5") 
+      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_16h5); 
+    else if (aruco_dictionary == "DICT_APRILTAG_25h9") 
+      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_25h9); 
+    else if (aruco_dictionary == "DICT_APRILTAG_36h10") 
+      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_36h10); 
+    else if (aruco_dictionary == "DICT_APRILTAG_36h11") 
+      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_36h11); 
+#endif 
     else 
     {
       ROS_ERROR_STREAM("fiducial_detectors/aruco_detector: UNDEFINED ARUCO DICTIONARY: " << aruco_dictionary << ", CHOOSING: DICT_4X4_50"); 
@@ -163,10 +190,48 @@ public:
     parameters_->minMarkerDistanceRate = minMarkerDistanceRate;
     parameters_->minMarkerPerimeterRate = minMarkerPerimeterRate;
     parameters_->minOtsuStdDev = minOtsuStdDev;
-    parameters_->doCornerRefinement = doCornerRefinement; 
     parameters_->perspectiveRemoveIgnoredMarginPerCell = perspectiveRemoveIgnoredMarginPerCell;
     parameters_->perspectiveRemovePixelPerCell = perspectiveRemovePixelPerCell;
     parameters_->polygonalApproxAccuracyRate = polygonalApproxAccuracyRate;
+    
+#if (CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR <= 2)
+    parameters_->doCornerRefinement = doCornerRefinement; 
+#endif
+#if ((CV_VERSION_MAJOR == 4) || (CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR > 2))
+    parameters_->adaptiveThreshConstant = adaptiveThreshConstant;
+    
+    if (cornerRefinementMethod == "CORNER_REFINE_NONE")
+      parameters_->cornerRefinementMethod = cv::aruco::CORNER_REFINE_NONE;     
+    else if (cornerRefinementMethod == "CORNER_REFINE_SUBPIX")
+      parameters_->cornerRefinementMethod = cv::aruco::CORNER_REFINE_SUBPIX;   
+    else if (cornerRefinementMethod == "CORNER_REFINE_CONTOUR")
+      parameters_->cornerRefinementMethod = cv::aruco::CORNER_REFINE_CONTOUR;  
+#if CV_VERSION_MAJOR == 4
+    else if (cornerRefinementMethod == "CORNER_REFINE_APRILTAG")
+      parameters_->cornerRefinementMethod = cv::aruco::CORNER_REFINE_APRILTAG; 
+#endif
+    else 
+    {
+      ROS_ERROR_STREAM("fiducial_detectors/aruco_detector: UNDEFINED REFINEMENT METHOD: " << cornerRefinementMethod << ", CHOOSING: CORNER_REFINE_NONE"); 
+      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::CORNER_REFINE_NONE);
+    }
+#if CV_VERSION_MAJOR == 4
+    // April :: User-configurable parameters.
+    parameters_->aprilTagQuadDecimate = aprilTagQuadDecimate;
+    parameters_->aprilTagQuadSigma = aprilTagQuadSigma;
+
+    // April :: Internal variables
+    parameters_->aprilTagMinClusterPixels = aprilTagMinClusterPixels;
+    parameters_->aprilTagMaxNmaxima = aprilTagMaxNmaxima;
+    parameters_->aprilTagCriticalRad = aprilTagCriticalRad;
+    parameters_->aprilTagMaxLineFitMse = aprilTagMaxLineFitMse;
+    parameters_->aprilTagMinWhiteBlackDiff = aprilTagMinWhiteBlackDiff;
+    parameters_->aprilTagDeglitch = aprilTagDeglitch;
+
+    // to detect white (inverted) markers
+    parameters_->detectInvertedMarker = detectInvertedMarker;
+#endif 
+#endif
   }
 }; 
 
