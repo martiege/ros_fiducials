@@ -1,4 +1,4 @@
-# `fiducial`
+# `ros_fiducial`
 Unofficial ROS package creating a common message structure for multiple fiducial marker detectors. Currently supporting the [AprilTag](https://april.eecs.umich.edu/software/apriltag) and [ArUco](https://www.uco.es/investiga/grupos/ava/node/26) detectors. 
 
 # Getting started
@@ -15,4 +15,5 @@ See [fiducial_conversions](fiducial_conversions/README.md), [fiducial_detectors]
 - [ ] Figure out better way of exporting other results from the detections than the current method, and include this for the ArUco detector. 
 - [ ] Remove hardcoded `"bgr8"` encoding from the ArUco detector. 
 - [ ] Further generalize `fiducial_detector.hpp`? 
+- [ ] Complete parameter descriptions
 - [x] Is the namespace too convoluted? Is it dishonest or confusing to use the `ros_`-prefix when this is not official? _Changed now_. 

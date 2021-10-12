@@ -33,7 +33,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(OpenCV 3 QUIET)
+find_package(OpenCV REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(apriltag REQUIRED apriltag)
@@ -171,21 +171,17 @@ target_link_libraries(apriltag_detector_node
   ${apriltag_LIBRARIES}
 )
 
-if(OpenCV_FOUND)
+add_executable(
+  aruco_detector_node src/aruco_main.cpp
+)
 
-  add_executable(
-    aruco_detector_node src/aruco_main.cpp
-  )
+add_dependencies(aruco_detector_node ${catkin_EXPORTED_TARGETS})
 
-  add_dependencies(aruco_detector_node ${catkin_EXPORTED_TARGETS})
-
-  target_link_libraries(aruco_detector_node
-    ${catkin_LIBRARIES}
-    ${apriltag_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-  )
-  
-endif()
+target_link_libraries(aruco_detector_node
+  ${catkin_LIBRARIES}
+  ${apriltag_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
 
 
 ## Rename C++ executable without prefix
