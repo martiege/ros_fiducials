@@ -1,53 +1,67 @@
-#pragma once 
-
 #include "fiducial_conversions/fiducial_stl.hpp"
+
+#include <fiducial_msgs/Detection.h>
+#include <fiducial_msgs/Point2D.h>
 
 
 namespace fiducial_conversions
 {
 
-std::vector<double>::iterator fromMsg(
-  std::vector<double>::iterator it, 
-  std::vector<double>::iterator end, 
-  const fiducial_msgs::Point2D& point
+void fromMsg(
+  const fiducial_msgs::Point2D& in_point, 
+  std::vector<double>& out_point
 )
 {
-  if (it == end)
-    return end; 
-  *it = point.x; 
-  it = std::next(it); 
-  
-  if (it == end)
-    return end; 
-  *it = point.y; 
-  return std::next(it); 
+  out_point.push_back(in_point.x);
+  out_point.push_back(in_point.y);
 }
 
-std::vector<std::array<double, 2>>::iterator fromMsg(
-  std::vector<std::array<double, 2>>::iterator it, 
-  std::vector<std::array<double, 2>>::iterator end, 
-  const fiducial_msgs::Point2D& point
+void fromMsg(
+  const fiducial_msgs::Point2D& in_point, 
+  std::array<double, 2>& out_point
 )
 {
-  if (it == end)
-    return end; 
-  (*it)[0] = point.x; 
-  (*it)[1] = point.y; 
-  return std::next(it); 
+  out_point[0] = in_point.x;
+  out_point[1] = in_point.y;
 }
 
-std::array<std::array<double, 2>, 4>::iterator fromMsg(
-  std::array<std::array<double, 2>, 4>::iterator it, 
-  std::array<std::array<double, 2>, 4>::iterator end, 
-  const fiducial_msgs::Point2D& point
+std::array<fiducial_msgs::Point2D, 4> getOrderedDetectionPoints(
+  const fiducial_msgs::Detection& detection, 
+  const std::array<std::size_t, 4> order = {0, 1, 2, 3}
 )
 {
-  if (it == end)
-    return end; 
-  (*it)[0] = point.x; 
-  (*it)[1] = point.y; 
-  return std::next(it); 
+  std::array<fiducial_msgs::Point2D, 4> orderedPoints; 
+
+  orderedPoints[order[0]] = detection.bottom_left; 
+  orderedPoints[order[1]] = detection.bottom_right; 
+  orderedPoints[order[2]] = detection.upper_right; 
+  orderedPoints[order[3]] = detection.upper_left; 
+
+  return orderedPoints; 
 }
+
+void fromMsg(
+  const fiducial_msgs::Detection& in_detection, 
+  std::vector<double>& out_detection
+)
+{
+  fromMsg(in_detection.bottom_left,  out_detection); 
+  fromMsg(in_detection.bottom_right, out_detection); 
+  fromMsg(in_detection.upper_right,  out_detection); 
+  fromMsg(in_detection.upper_left,   out_detection); 
+}
+
+void fromMsg(
+  const fiducial_msgs::Detection& in_detection, 
+  std::vector<std::vector<double>>& out_detection
+)
+{
+  out_detection.emplace_back(); 
+  fromMsg(in_detection.bottom_left, *out_detection.rbegin()); 
+}
+
+/*
+
 
 template <class T> 
 T fromMsg(T it, T end, const fiducial_msgs::Detection& detection)
@@ -178,6 +192,6 @@ void fromMsg(
     result[4 * detection.id + 3][1] = detection.upper_left.y; 
   }
 }
-
+*/
 
 } // fiducial_conversions

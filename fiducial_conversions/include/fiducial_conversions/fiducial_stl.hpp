@@ -14,6 +14,11 @@
 namespace fiducial_conversions
 {
 
+// TODO: Could using macros or defines be a better / faster solution? 
+const std::array<std::size_t, 4> DETECTION_POINTS_ORDER_STANDARD = {0, 1, 2, 3};  
+const std::array<std::size_t, 4> DETECTION_POINTS_ORDER_APRILTAG = {0, 1, 2, 3};  
+const std::array<std::size_t, 4> DETECTION_POINTS_ORDER_ARUCO    = {3, 2, 1, 0};  
+
 std::vector<double>::iterator fromMsg(
   std::vector<double>::iterator it, 
   std::vector<double>::iterator end, 
