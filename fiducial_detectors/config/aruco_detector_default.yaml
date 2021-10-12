@@ -6,6 +6,12 @@ detections_queue_size:  10
 camera_base_topic:     "/usb_cam/image_raw"
 camera_queue_size:      10
 
+# Publish visualised detections parameters. 
+visualise_detections:           True
+visualise_detection_topic:     "detection_image"
+visualise_detection_queue_size: 10
+
+# Aruco detector parameters. 
 ## Aruco detector parameters. 
 # Each dictionary indicates the number 
 # of bits and the number of 

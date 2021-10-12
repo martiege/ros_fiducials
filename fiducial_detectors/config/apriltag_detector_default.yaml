@@ -6,6 +6,11 @@ detections_queue_size:  10
 camera_base_topic:     "/usb_cam/image_raw"
 camera_queue_size:      10
 
+# Publish visualised detections parameters. 
+visualise_detections:           True
+visualise_detection_topic:     "detection_image"
+visualise_detection_queue_size: 10
+
 # Aruco detector parameters. 
 tag_family:            "tag36h11"
 quad_decimate:          2.0 

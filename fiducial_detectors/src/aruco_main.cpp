@@ -12,12 +12,10 @@ int main(int argc, char** argv)
   
   ros::NodeHandle pnh("~"); 
 
-
   std::vector<std::string> v; 
   pnh.getParamNames(v); 
-
   for (auto a : v)
-    ROS_INFO_STREAM("param: " << a << '\n'); 
+    ROS_INFO_STREAM("param: " << a); 
 
   std::string camera_base_topic; 
   int32_t camera_queue_size{0}; 
@@ -51,7 +49,32 @@ int main(int argc, char** argv)
   {
     ROS_ERROR("fiducial_detectors/aruco_main: detections_queue_size not found"); 
     return EXIT_FAILURE; 
+  } 
+
+  bool visualise_detections; 
+  std::string visualise_detection_topic; 
+  int32_t visualise_detection_queue_size{0}; 
+  if (pnh.getParam("visualise_detections", visualise_detections)) 
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: visualise_detections: " << visualise_detections); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: visualise_detections not found"); 
+    return EXIT_FAILURE; 
   }
+  if (pnh.getParam("visualise_detection_topic", visualise_detection_topic)) 
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: visualise_detection_topic: " << visualise_detection_topic); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: visualise_detection_topic not found"); 
+    return EXIT_FAILURE; 
+  }
+  if (pnh.getParam("visualise_detection_queue_size", visualise_detection_queue_size))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: visualise_detection_queue_size: " << visualise_detection_queue_size); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: visualise_detection_queue_size not found"); 
+    return EXIT_FAILURE; 
+  } 
 
   std::string aruco_dictionary; 
   if (pnh.getParam("aruco_dictionary", aruco_dictionary))
@@ -341,6 +364,7 @@ int main(int argc, char** argv)
     pnh, 
     camera_base_topic, camera_queue_size, 
     detections_topic, detections_queue_size, 
+    visualise_detections, visualise_detection_topic, visualise_detection_queue_size,
     aruco_dictionary, 
     adaptiveThreshWinSizeMax, adaptiveThreshWinSizeMin, adaptiveThreshWinSizeStep,
     cornerRefinementMaxIterations, cornerRefinementMinAccuracy, cornerRefinementWinSize,

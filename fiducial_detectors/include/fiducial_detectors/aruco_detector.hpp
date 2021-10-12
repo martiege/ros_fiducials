@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory> 
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/imgproc.hpp>
 #include <vector> 
 
 #include <sensor_msgs/Image.h>
@@ -44,11 +46,29 @@ private:
     try
     {
       // TODO: generalise? 
-      img_ptr = cv_bridge::toCvCopy(image_msg, "bgr8"); 
+      img_ptr = cv_bridge::toCvCopy(image_msg, "passth"); 
     }
     catch (cv_bridge::Exception& e)
     {
       ROS_WARN_STREAM("fiducial_detectors/aruco_detector: cv_bridge::toCvCopy exception in fiducial_detectors/apriltag_detector.hpp: " << e.what()); 
+      return detectionArray; 
+    }
+
+    cv::Mat gray; 
+    if (sensor_msgs::image_encodings::isBayer(image_msg->encoding))
+      cv::cvtColor(img_ptr->image, gray, cv::COLOR_BGR2GRAY); 
+    else if (sensor_msgs::image_encodings::isColor(image_msg->encoding))
+      cv::cvtColor(img_ptr->image, gray, cv::COLOR_RGB2GRAY); 
+    else if (sensor_msgs::image_encodings::isMono(image_msg->encoding))
+    {
+      if (sensor_msgs::image_encodings::bitDepth(image_msg->encoding) != 8)
+        img_ptr->image.convertTo(gray, CV_16UC1, static_cast<double>(1 << 8) / static_cast<double>(1 << sensor_msgs::image_encodings::bitDepth(image_msg->encoding))); 
+      else
+        gray = img_ptr->image.clone();
+    }
+    else
+    {
+      ROS_WARN_STREAM("Unknown sensor_msgs::image_encodings in fiducial_detectors/apriltag_detector.hpp: " << img_ptr->encoding); 
       return detectionArray; 
     }
 
@@ -91,6 +111,7 @@ public:
     const ros::NodeHandle& nh, 
     const std::string& camera_base_topic, uint32_t camera_queue_size, 
     const std::string& detection_topic,   uint32_t detection_queue_size, 
+    bool visualiseDetections, const std::string& visualise_detection_topic, uint32_t visualise_detection_queue_size, 
     const std::string& aruco_dictionary, 
     int adaptiveThreshWinSizeMax, int	adaptiveThreshWinSizeMin, int	adaptiveThreshWinSizeStep,
     int	cornerRefinementMaxIterations, double cornerRefinementMinAccuracy, int cornerRefinementWinSize,
@@ -120,7 +141,8 @@ public:
   ) : FiducialDetector(
       nh, 
       camera_base_topic, camera_queue_size, 
-      detection_topic, detection_queue_size
+      detection_topic, detection_queue_size, 
+      visualiseDetections, visualise_detection_topic, visualise_detection_queue_size
     )
   {
     if (aruco_dictionary == "DICT_4X4_50")

@@ -46,6 +46,31 @@ int main(int argc, char** argv)
     return EXIT_FAILURE; 
   }
 
+  bool visualise_detections; 
+  std::string visualise_detection_topic; 
+  int32_t visualise_detection_queue_size{0}; 
+  if (pnh.getParam("visualise_detections", visualise_detections)) 
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: visualise_detections: " << visualise_detections); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: visualise_detections not found"); 
+    return EXIT_FAILURE; 
+  }
+  if (pnh.getParam("visualise_detection_topic", visualise_detection_topic)) 
+    ROS_INFO_STREAM("fiducial_detectors/apriltag_main: visualise_detection_topic: " << visualise_detection_topic); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/apriltag_main: visualise_detection_topic not found"); 
+    return EXIT_FAILURE; 
+  }
+  if (pnh.getParam("visualise_detection_queue_size", visualise_detection_queue_size))
+    ROS_INFO_STREAM("fiducial_detectors/apriltag_main: visualise_detection_queue_size: " << visualise_detection_queue_size); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/apriltag_main: visualise_detection_queue_size not found"); 
+    return EXIT_FAILURE; 
+  } 
+
   std::string tag_family; 
   if (pnh.getParam("tag_family", tag_family))
     ROS_INFO_STREAM("fiducial_detectors/apriltag_main: tag_family: " << tag_family); 
@@ -105,6 +130,7 @@ int main(int argc, char** argv)
     pnh, 
     camera_base_topic, camera_queue_size, 
     detections_topic, detections_queue_size, 
+    visualise_detections, visualise_detection_topic, visualise_detection_queue_size,
     tag_family, 
     quad_decimate, quad_sigma, 
     nthreads, debug, refine_edges
@@ -115,86 +141,3 @@ int main(int argc, char** argv)
   return 0;
 }
 
-/*
-
-public: 
-  ArucoDetector(
-    const ros::NodeHandle& nh, 
-    const std::string& camera_base_topic, uint32_t camera_queue_size, 
-    const std::string& detections_topic,   uint32_t detections_queue_size, 
-    const std::string& aruco_dictionary, 
-    double adaptiveThreshConstant, int adaptiveThreshWinSizeMax, int	adaptiveThreshWinSizeMin, int	adaptiveThreshWinSizeStep,
-    int	cornerRefinementMaxIterations, int cornerRefinementMethod, double cornerRefinementMinAccuracy, int cornerRefinementWinSize,
-    double errorCorrectionRate,
-    int	markerBorderBits,
-    double maxErroneousBitsInBorderRate, double maxMarkerPerimeterRate,
-    double minCornerDistanceRate, int minDistanceToBorder, double minMarkerDistanceRate, double minMarkerPerimeterRate, double minOtsuStdDev,
-    double perspectiveRemoveIgnoredMarginPerCell, int perspectiveRemovePixelPerCell,
-    double polygonalApproxAccuracyRate
-  ) : FiducialDetector(
-      nh, 
-      camera_base_topic, camera_queue_size, 
-      detections_topic, detections_queue_size
-    )
-  {
-{    if (aruco_dictionary == "DICT_4X4_50")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-    else if (aruco_dictionary == "DICT_4X4_100")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
-    else if (aruco_dictionary == "DICT_4X4_250")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
-    else if (aruco_dictionary == "DICT_4X4_1000")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_1000);
-    else if (aruco_dictionary == "DICT_5X5_50")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_50);
-    else if (aruco_dictionary == "DICT_5X5_100")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_100);
-    else if (aruco_dictionary == "DICT_5X5_250")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_250);
-    else if (aruco_dictionary == "DICT_5X5_1000")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
-    else if (aruco_dictionary == "DICT_6X6_50")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
-    else if (aruco_dictionary == "DICT_6X6_100")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_100);
-    else if (aruco_dictionary == "DICT_6X6_250")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-    else if (aruco_dictionary == "DICT_6X6_1000")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
-    else if (aruco_dictionary == "DICT_7X7_50")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_7X7_50);
-    else if (aruco_dictionary == "DICT_7X7_100")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_7X7_100);
-    else if (aruco_dictionary == "DICT_7X7_250")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_7X7_250);
-    else if (aruco_dictionary == "DICT_7X7_1000")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_7X7_1000);
-    else if (aruco_dictionary == "DICT_ARUCO_ORIGINAL")
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
-    else 
-    {
-      ROS_ERROR_STREAM("fiducial_detectors/aruco_detector: UNDEFINED ARUCO DICTIONARY: " << aruco_dictionary << ", CHOOSING: DICT_4X4_50"); 
-      dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-    }}
-
-    parameters_ = cv::aruco::DetectorParameters::create(); 
-    parameters_->adaptiveThreshWinSizeMax = adaptiveThreshWinSizeMax;
-    parameters_->adaptiveThreshWinSizeMin = adaptiveThreshWinSizeMin;
-    parameters_->adaptiveThreshWinSizeStep = adaptiveThreshWinSizeStep;
-    parameters_->cornerRefinementMaxIterations = cornerRefinementMaxIterations;
-    parameters_->cornerRefinementMinAccuracy = cornerRefinementMinAccuracy;
-    parameters_->cornerRefinementWinSize = cornerRefinementWinSize;
-    parameters_->errorCorrectionRate = errorCorrectionRate;
-    parameters_->markerBorderBits = markerBorderBits;
-    parameters_->maxErroneousBitsInBorderRate = maxErroneousBitsInBorderRate;
-    parameters_->maxMarkerPerimeterRate = maxMarkerPerimeterRate;
-    parameters_->minCornerDistanceRate = minCornerDistanceRate;
-    parameters_->minDistanceToBorder = minDistanceToBorder;
-    parameters_->minMarkerDistanceRate = minMarkerDistanceRate;
-    parameters_->minMarkerPerimeterRate = minMarkerPerimeterRate;
-    parameters_->minOtsuStdDev = minOtsuStdDev;
-    parameters_->perspectiveRemoveIgnoredMarginPerCell = perspectiveRemoveIgnoredMarginPerCell;
-    parameters_->perspectiveRemovePixelPerCell = perspectiveRemovePixelPerCell;
-    parameters_->polygonalApproxAccuracyRate = polygonalApproxAccuracyRate;
-  }
-}; */

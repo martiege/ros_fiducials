@@ -46,13 +46,22 @@ private:
       return detectionArray; 
     }
 
-    cv::Mat gray(image_msg->width, image_msg->height, CV_8UC3); 
+    // TODO: Optimize this? Demand grayscale input? 
+    cv::Mat gray; 
     if (sensor_msgs::image_encodings::isBayer(image_msg->encoding))
       cv::cvtColor(img_ptr->image, gray, cv::COLOR_BGR2GRAY); 
     else if (sensor_msgs::image_encodings::isColor(image_msg->encoding))
       cv::cvtColor(img_ptr->image, gray, cv::COLOR_RGB2GRAY); 
     else if (sensor_msgs::image_encodings::isMono(image_msg->encoding))
-      gray = img_ptr->image.clone();
+    {
+      if (sensor_msgs::image_encodings::bitDepth(image_msg->encoding) != 8)
+        img_ptr->image.convertTo(
+          gray, CV_8UC1, 
+          static_cast<double>(1 << 8) / static_cast<double>(1 << sensor_msgs::image_encodings::bitDepth(image_msg->encoding))
+        ); 
+      else
+        gray = img_ptr->image.clone();
+    }
     else
     {
       ROS_WARN_STREAM("Unknown sensor_msgs::image_encodings in fiducial_detectors/apriltag_detector.hpp: " << img_ptr->encoding); 
@@ -111,13 +120,15 @@ public:
     const ros::NodeHandle& nh, 
     const std::string& camera_base_topic, uint32_t camera_queue_size, 
     const std::string& detection_topic,   uint32_t detection_queue_size, 
+    bool visualiseDetections, const std::string& visualise_detection_topic, uint32_t visualise_detection_queue_size, 
     const std::string& family, 
     double quad_decimate, double quad_sigma, 
     int nthreads, bool debug, bool refine_edges
   ) : FiducialDetector(
       nh, 
       camera_base_topic, camera_queue_size, 
-      detection_topic, detection_queue_size
+      detection_topic, detection_queue_size, 
+      visualiseDetections, visualise_detection_topic, visualise_detection_queue_size
     )
   {
     id_       = stringToApriltagFamily(family); 
