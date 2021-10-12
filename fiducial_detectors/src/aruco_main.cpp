@@ -12,11 +12,6 @@ int main(int argc, char** argv)
   
   ros::NodeHandle pnh("~"); 
 
-  std::vector<std::string> v; 
-  pnh.getParamNames(v); 
-  for (auto a : v)
-    ROS_INFO_STREAM("param: " << a); 
-
   std::string camera_base_topic; 
   int32_t camera_queue_size{0}; 
   if (pnh.getParam("camera_base_topic", camera_base_topic))
