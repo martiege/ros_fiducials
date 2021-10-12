@@ -42,11 +42,11 @@ private:
     detectionArray.header = image_msg->header; 
     detectionArray.detector = "aruco";
 
-    cv_bridge::CvImagePtr img_ptr; 
+    cv_bridge::CvImageConstPtr img_ptr; 
     try
     {
       // TODO: generalise? 
-      img_ptr = cv_bridge::toCvCopy(image_msg, "passth"); 
+      img_ptr = cv_bridge::toCvShare(image_msg); 
     }
     catch (cv_bridge::Exception& e)
     {
@@ -62,7 +62,7 @@ private:
     else if (sensor_msgs::image_encodings::isMono(image_msg->encoding))
     {
       if (sensor_msgs::image_encodings::bitDepth(image_msg->encoding) != 8)
-        img_ptr->image.convertTo(gray, CV_16UC1, static_cast<double>(1 << 8) / static_cast<double>(1 << sensor_msgs::image_encodings::bitDepth(image_msg->encoding))); 
+        img_ptr->image.convertTo(gray, CV_8UC1, static_cast<double>(1 << 8) / static_cast<double>(1 << sensor_msgs::image_encodings::bitDepth(image_msg->encoding))); 
       else
         gray = img_ptr->image.clone();
     }
@@ -73,7 +73,7 @@ private:
     }
 
     cv::aruco::detectMarkers(
-      img_ptr->image, 
+      gray, 
       dictionary_, 
       corners_, ids_, 
       parameters_, 
