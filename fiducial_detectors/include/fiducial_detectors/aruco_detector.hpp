@@ -2,6 +2,7 @@
 
 #include <memory> 
 #include <opencv2/core/hal/interface.h>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <vector> 
 
@@ -82,6 +83,7 @@ private:
 
     if (! corners_.empty())
     {
+      detectionArray.detections.reserve(corners_.size()); 
       for (std::size_t i{0}; i < corners_.size(); ++i)
       {
         fiducial_msgs::Detection ros_det; 

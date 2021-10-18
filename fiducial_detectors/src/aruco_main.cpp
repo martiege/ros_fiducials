@@ -189,7 +189,7 @@ int main(int argc, char** argv)
   } 
 
   double minMarkerDistanceRate;
-  if (pnh.getParam("minDistanceToBorder", minMarkerDistanceRate))
+  if (pnh.getParam("minMarkerDistanceRate", minMarkerDistanceRate))
     ROS_INFO_STREAM("fiducial_detectors/aruco_main: minMarkerDistanceRate: " << minMarkerDistanceRate); 
   else 
   {

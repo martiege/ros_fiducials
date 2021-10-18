@@ -1,8 +1,12 @@
 #pragma once 
 
 #include "image_transport/publisher.h"
+#include "sensor_msgs/image_encodings.h"
 #include <opencv2/core.hpp>
 #include <opencv2/core/hal/interface.h>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <sstream>
 #include <string>
 
 #include <ros/ros.h> 
@@ -63,15 +67,22 @@ public:
     if (visualiseDetection_) 
     {
       cv_bridge::CvImageConstPtr img_ptr = cv_bridge::toCvShare(image_msg); 
-      
+
       cv::Mat image; 
-      img_ptr->image.convertTo(image, CV_64FC3, 1.0 / sensor_msgs::image_encodings::bitDepth(image_msg->encoding)); 
+      if (sensor_msgs::image_encodings::isMono(image_msg->encoding))
+        cv::cvtColor(img_ptr->image, image, cv::COLOR_GRAY2BGR); 
+      else  
+        image = img_ptr->image.clone(); 
+      image.convertTo(image, CV_64FC3, 1.0 / (1 << sensor_msgs::image_encodings::bitDepth(image_msg->encoding))); 
       fiducial_detectors::visualiseDetectionArray(
         image, detections, 
-        cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(1, 1, 1), 
-        cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(1, 1, 1), 
+        cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 0), 
+        cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 0), 
         cv::Scalar(1, 0, 0), cv::Scalar(0, 1, 0), cv::Scalar(1, 0, 0), cv::Scalar(0, 0, 1)
       ); 
+
+      cv_bridge::CvImage vis(image_msg->header, "64FC3", image); 
+      visualiseDetectionPublisher_.publish(vis.toImageMsg()); 
     }
   }
 }; 

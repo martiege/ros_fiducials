@@ -68,6 +68,9 @@ adaptiveThreshWinSizeMin:               3
 # adaptiveThreshWinSizeMax during the
 # thresholding (default 10).
 adaptiveThreshWinSizeStep:              10 
+# Constant for adaptive thresholding 
+# before finding contours (default 7)
+adaptiveThreshConstant:                 7
 # Maximum number of iterations for 
 # stop criteria of the corner
 #  refinement process (default 30).
@@ -94,7 +97,13 @@ markerBorderBits:                       1
 # Represented as a rate respect to the 
 # total number of bits per marker 
 # (default 0.35).
-maxErroneousBitsInBorderRate:           0.35 
+maxErroneousBitsInBorderRate:           0.35
+# Determine minimum perimeter for 
+# marker contour to be detected. 
+# This is defined as a rate respect 
+# to the maximum dimension of 
+# the input image (default 0.03).
+minMarkerPerimeterRate:                 0.03
 # Determine maximum perimeter for 
 # marker contour to be detected. This 
 # is defined as a rate respect to the 
@@ -116,12 +125,6 @@ minDistanceToBorder:                    3
 # the smaller perimeter of the two 
 # markers (default 0.05).
 minMarkerDistanceRate:                  0.05 
-# Determine minimum perimeter for 
-# marker contour to be detected. 
-# This is defined as a rate respect 
-# to the maximum dimension of 
-# the input image (default 0.03).
-minMarkerPerimeterRate:                 0.03
 # Minimun standard deviation in pixels
 # values during the decodification 
 # step to apply Otsu thresholding 
@@ -152,10 +155,6 @@ polygonalApproxAccuracyRate:            0.03
 doCornerRefinement:                     true 
 
 ## OpenCV Version >= 4
-# Constant for adaptive thresholding 
-# before finding contours (default 7)
-adaptiveThreshConstant:                 7
-
 ## Corner refinement method. 
 # CORNER_REFINE_NONE, 
 #   no refinement.
@@ -169,32 +168,56 @@ adaptiveThreshConstant:                 7
 cornerRefinementMethod:                "CORNER_REFINE_NONE"
 
 ## Parameters for AprilTag detection using the ArUco detector
-# Detection of quads can be done on a lower-resolution image, improving speed at a
-# cost of pose accuracy and a slight decrease in detection rate. 
-# Decoding the binary payload is still done at full resolution. (default 0.0)
+# Detection of quads can be done on a 
+# lower-resolution image, improving 
+# speed at a cost of pose accuracy and
+# a slight decrease in detection rate. 
+# Decoding the binary payload is still 
+# done at full resolution. (default 0.0)
 aprilTagQuadDecimate:                   0.0
-# What Gaussian blur should be applied to the segmented image (used for quad detection?)
-# Parameter is the standard deviation in pixels. 
-# Very noisy images benefit from non-zero values (e.g. 0.8). (default 0.0)
+# What Gaussian blur should be applied 
+# to the segmented image 
+# (used for quad detection?)
+# Parameter is the standard deviation in 
+# pixels. Very noisy images benefit 
+# from non-zero values (e.g. 0.8). 
+# (default 0.0)
 aprilTagQuadSigma:                      0.8
-# Reject quads containing too few pixels. (default 5)
+# Reject quads containing too 
+# few pixels. (default 5)
 aprilTagMinClusterPixels:               5
-# How many corner candidates to consider when segmenting a group of pixels into a quad. (default 10)
+# How many corner candidates to consider
+# when segmenting a group of pixels
+# into a quad. (default 10)
 aprilTagMaxNmaxima:                     10
-# Reject quads where pairs of edges have angles that are close to straight or close to
-# 180 degrees. Zero means that no quads are rejected. (In radians) (default 10*PI/180)
+# Reject quads where pairs of edges
+# have angles that are close to straight
+# or close to 180 degrees. Zero means
+# that no quads are rejected. 
+# (In radians) (default 10*PI/180)
 aprilTagCriticalRad:                    0.17453292519943295
-# When fitting lines to the contours, what is the maximum mean squared error
-# allowed?  This is useful in rejecting contours that are far from being quad shaped; rejecting
-# these quads "early" saves expensive decoding processing. (default 10.0)
+# When fitting lines to the contours, 
+# what is the maximum mean squared error
+# allowed?  This is useful in rejecting 
+# contours that are far from being quad
+# shaped; rejecting these quads "early"
+# saves expensive decoding processing.
+# (default 10.0)
 aprilTagMaxLineFitMse:                  10.0
-# Detection of quads can be done on a lower-resolution image, improving speed at a
-# cost of pose accuracy and a slight decrease in detection rate. 
-# Decoding the binary payload is still done at full resolution. (default 0.0)
+# Detection of quads can be done on a 
+# lower-resolution image, improving 
+# speed at a cost of pose accuracy 
+# and a slight decrease in detection rate. 
+# Decoding the binary payload is still
+# done at full resolution. (default 0.0)
 aprilTagMinWhiteBlackDiff:              5
-# Should the thresholded image be deglitched? 
-# Only useful for very noisy images. (default 0)
+# Should the thresholded image be 
+# deglitched? Only useful for very 
+# noisy images. (default 0)
 aprilTagDeglitch:                       0.0
-# To check if there is a white marker. In order to generate a "white" marker just
-# invert a normal marker by using a tilde, ~markerImage. (default false)
+# To check if there is a white marker. 
+# In order to generate a "white" 
+# marker just invert a normal marker 
+# by using a tilde, ~markerImage. 
+# (default false)
 detectInvertedMarker:                   false
