@@ -36,6 +36,19 @@ pkg_search_module(apriltag REQUIRED apriltag)
 set(apriltag_INCLUDE_DIRS "${apriltag_INCLUDE_DIRS}/apriltag")
 link_directories(${apriltag_LIBDIR})
 
+find_package(Python 3 REQUIRED)
+add_custom_target(
+  apriltag_defined_families ALL
+  COMMAND
+    ${PYTHON_EXECUTABLE}
+    ${CMAKE_CURRENT_LIST_DIR}/scripts/apriltag_includes_update.py --output_path
+    ${CMAKE_CURRENT_LIST_DIR}/include --namespace ${PROJECT_NAME}
+    --apriltag_include_dir ${apriltag_INCLUDE_DIRS}
+  BYPRODUCTS
+    ${CMAKE_CURRENT_LIST_DIR}/include/${PROJECT_NAME}/apriltag_defined_families.h
+  DEPENDS ${CMAKE_CURRENT_LIST_DIR}/scripts/apriltag_includes_update.py
+  COMMENT "Generating apriltag_defined_families.h")
+
 # message("new command") add_custom_command( PRE_BUILD OUTPUT
 # ${CMAKE_CURRENT_LIST_DIR}/include/${PROJECT_NAME}/apriltag_defined_families.h
 # COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/scripts/apriltag_includes_update.py
@@ -143,19 +156,6 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${apriltag_INCLUDE_DIRS}
 # packages don't collide add_executable(${PROJECT_NAME}_node
 # src/fiducial_detectors_node.cpp)
 add_executable(apriltag_detector_node src/apriltag_main.cpp)
-
-find_package(Python 3 REQUIRED)
-add_custom_target(
-  apriltag_defined_families ALL
-  COMMAND
-    ${PYTHON_EXECUTABLE}
-    ${CMAKE_CURRENT_LIST_DIR}/scripts/apriltag_includes_update.py --output_path
-    ${CMAKE_CURRENT_LIST_DIR}/include --namespace ${PROJECT_NAME}
-    --apriltag_include_dir ${apriltag_INCLUDE_DIRS}
-  BYPRODUCTS
-    ${CMAKE_CURRENT_LIST_DIR}/include/${PROJECT_NAME}/apriltag_defined_families.h
-  DEPENDS ${CMAKE_CURRENT_LIST_DIR}/scripts/apriltag_includes_update.py
-  COMMENT "Generating apriltag_defined_families.h")
 
 add_dependencies(apriltag_detector_node ${catkin_EXPORTED_TARGETS}
                  apriltag_defined_families)
