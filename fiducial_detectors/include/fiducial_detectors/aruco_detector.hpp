@@ -28,6 +28,8 @@ namespace fiducial_detectors
 class ArucoDetector : public FiducialDetector
 {
 private: 
+  bool camera_rectified_; 
+
   cv::Ptr<cv::aruco::DetectorParameters> parameters_;
   cv::Ptr<cv::aruco::Dictionary> dictionary_;
 
@@ -111,7 +113,7 @@ private:
 public: 
   ArucoDetector(
     const ros::NodeHandle& nh, 
-    const std::string& camera_base_topic, uint32_t camera_queue_size, 
+    const std::string& camera_base_topic, uint32_t camera_queue_size, bool camera_rectified,
     const std::string& detection_topic,   uint32_t detection_queue_size, 
     bool visualiseDetections, const std::string& visualise_detection_topic, uint32_t visualise_detection_queue_size, 
     const std::string& aruco_dictionary, 
@@ -145,7 +147,7 @@ public:
       camera_base_topic, camera_queue_size, 
       detection_topic, detection_queue_size, 
       visualiseDetections, visualise_detection_topic, visualise_detection_queue_size
-    )
+    ), camera_rectified_(camera_rectified)
   {
     if (aruco_dictionary == "DICT_4X4_50")
       dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);

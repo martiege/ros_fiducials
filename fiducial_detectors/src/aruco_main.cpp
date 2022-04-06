@@ -12,23 +12,6 @@ int main(int argc, char** argv)
   
   ros::NodeHandle pnh("~"); 
 
-  std::string camera_base_topic; 
-  int32_t camera_queue_size{0}; 
-  if (pnh.getParam("camera_base_topic", camera_base_topic))
-    ROS_INFO_STREAM("fiducial_detectors/aruco_main: camera_base_topic: " << camera_base_topic); 
-  else 
-  {
-    ROS_ERROR("fiducial_detectors/aruco_main: camera_base_topic not found"); 
-    return EXIT_FAILURE; 
-  }
-  if (pnh.getParam("camera_queue_size", camera_queue_size)) 
-    ROS_INFO_STREAM("fiducial_detectors/aruco_main: camera_queue_size: " << camera_queue_size); 
-  else 
-  {
-    ROS_ERROR("fiducial_detectors/aruco_main: camera_queue_size not found"); 
-    return EXIT_FAILURE; 
-  }
-
   std::string detections_topic; 
   int32_t detections_queue_size{0}; 
   if (pnh.getParam("detections_topic", detections_topic)) 
@@ -45,6 +28,31 @@ int main(int argc, char** argv)
     ROS_ERROR("fiducial_detectors/aruco_main: detections_queue_size not found"); 
     return EXIT_FAILURE; 
   } 
+
+  std::string camera_base_topic; 
+  int32_t camera_queue_size{0}; 
+  bool camera_rectified = false; 
+  if (pnh.getParam("camera_base_topic", camera_base_topic))
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: camera_base_topic: " << camera_base_topic); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: camera_base_topic not found"); 
+    return EXIT_FAILURE; 
+  }
+  if (pnh.getParam("camera_queue_size", camera_queue_size)) 
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: camera_queue_size: " << camera_queue_size); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: camera_queue_size not found"); 
+    return EXIT_FAILURE; 
+  }
+  if (pnh.getParam("camera_rectified", camera_rectified)) 
+    ROS_INFO_STREAM("fiducial_detectors/aruco_main: camera_rectified: " << camera_rectified); 
+  else 
+  {
+    ROS_ERROR("fiducial_detectors/aruco_main: camera_rectified not found"); 
+    return EXIT_FAILURE; 
+  }
 
   bool visualise_detections; 
   std::string visualise_detection_topic; 
@@ -357,7 +365,7 @@ int main(int argc, char** argv)
 
   fiducial_detectors::ArucoDetector detector(
     pnh, 
-    camera_base_topic, camera_queue_size, 
+    camera_base_topic, camera_queue_size, camera_rectified,
     detections_topic, detections_queue_size, 
     visualise_detections, visualise_detection_topic, visualise_detection_queue_size,
     aruco_dictionary, 

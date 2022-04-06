@@ -5,6 +5,7 @@ detections_queue_size:  10
 # Subscriber parameters. 
 camera_base_topic:     "/usb_cam/image_raw"
 camera_queue_size:      10
+camera_rectified:       False
 
 # Publish visualised detections parameters. 
 visualise_detections:           True
