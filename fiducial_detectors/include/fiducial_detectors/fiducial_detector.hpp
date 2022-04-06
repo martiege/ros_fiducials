@@ -80,8 +80,9 @@ public:
         cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 0), 
         cv::Scalar(1, 0, 0), cv::Scalar(0, 1, 0), cv::Scalar(1, 0, 0), cv::Scalar(0, 0, 1)
       ); 
+      image.convertTo(image, CV_8UC3, (1 << 8) - 1); 
 
-      cv_bridge::CvImage vis(image_msg->header, "64FC3", image); 
+      cv_bridge::CvImage vis(image_msg->header, sensor_msgs::image_encodings::RGB8, image); 
       visualiseDetectionPublisher_.publish(vis.toImageMsg()); 
     }
   }
