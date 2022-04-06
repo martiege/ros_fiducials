@@ -31,7 +31,7 @@
 *.out
 *.app
 
-# clangd 
+# clangd
 .cache/
 .clangd/
 compile_commands.json
@@ -42,3 +42,5 @@ compile_commands.json
 
 # Local History for Visual Studio Code
 .history/
+
+apriltag_defined_families.h
